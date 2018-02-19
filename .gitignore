@@ -1,0 +1,9 @@
+# inclu tous les validation du projet
+
+/*
+*.DS_Store
+*META-INF/
+
+# exclu les suivants.
+!TP2/
+!.gitignore

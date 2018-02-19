@@ -1,0 +1,5 @@
+Select d.matricule, d.nomM, d.prenomM, count(*)
+From Consultation c, docteur d
+Where c.CodeDocteur = d.matricule
+Group By d.matricule, d.nomM, d.prenomM
+/* Having count (distinct numDos, dateC); ??? Développement en cours !  = ) */

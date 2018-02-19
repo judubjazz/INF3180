@@ -1,0 +1,57 @@
+
+/* DEVELOPPEMENT : TRIGGER UPDATE NBR MOYEN MEDICAMENT */
+Create or Replace Trigger Update_nbrMoyenMedicaments
+After Insert on Ordonnance
+For Each Row
+declare moyenne number (4,2);
+
+Begin
+	Select avg(nbrMedicaments) into moyenne
+	 from Ordonnance o, Docteur d
+	 Where o.numOrd = :new.numOrd and :new.CodeDocteur = d.matricule
+	 Group By d.matricule;
+	 
+	Update Docteur
+	Set nbrMoyenMedicaments = moyenne
+	Where :new.CodeDocteur = docteur.matricule;
+	
+End;
+
+/* TEST qui fonctionne mais seulement l'affichage de la moyenne ! */
+
+Select d.matricule, d.nomM, d.prenomM, avg(nbrMedicaments)
+	 from Ordonnance o, Consultation c, Docteur d
+	 Where o.numOrd = c.numOrd and c.CodeDocteur = d.matricule
+	 Group By d.matricule, d.nomM, d.prenomM;
+	 
+Select avg(nbrMedicaments)
+	 from Ordonnance o, Consultation c, Docteur d
+	 Where o.numOrd = c.numOrd and c.CodeDocteur = 1;
+
+
+
+/* DEVELOPPEMENT : TRIGGER UPDATE NBR MEDICAMENT ET NBR MOYEN MEDICAMENT */
+Create or Replace Trigger Update_nbrMedicaments
+After Insert on OrdonnanceMedicaments
+For Each Row
+declare moyenne number (4,2), idDocteur integer;
+
+Begin 
+	Update Ordonnance
+	Set nbrMedicaments = nbrMedicaments + 1
+	Where :new.numOrd = ordonnance.numOrd;
+
+	Select c.codeDocteur into idDocteur
+	From Consultation c
+	Where :new.numOrd = c.numOrd
+
+	Select avg(nbrMedicaments) into moyenne
+	from Ordonnance o, Consultation c
+	Where o.numOrd = c.numOrd and c.CodeDocteur = idDocteur;
+	 
+	Update Docteur
+	Set nbrMoyenMedicaments = moyenne
+	Where docteur.matricule = idDocteur;
+
+	
+End;
